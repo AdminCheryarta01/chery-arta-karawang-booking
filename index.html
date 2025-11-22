@@ -935,7 +935,6 @@
             color: white;
         }
 
-        /* MOBILE RESPONSIVE TABLE */
         .table-wrapper {
             width: 100%;
             overflow-x: auto;
@@ -967,7 +966,6 @@
             word-wrap: break-word;
         }
 
-        /* CARD VIEW FOR MOBILE */
         .mobile-card-view {
             display: none;
         }
@@ -1225,7 +1223,6 @@
             text-align: center;
         }
 
-        /* MEDIA QUERIES */
         @media (max-width: 1024px) {
             .hero-content h1 {
                 font-size: 2.5rem;
@@ -1308,7 +1305,6 @@
                 grid-template-columns: 1fr;
             }
 
-            /* HIDE TABLE, SHOW CARDS ON MOBILE */
             .table-wrapper {
                 display: none !important;
             }
@@ -1774,7 +1770,6 @@
                 </button>
             </div>
             
-            <!-- Desktop Table View -->
             <div class="table-wrapper">
                 <table class="table" id="serviceTable" style="display: none;">
                     <thead>
@@ -1790,7 +1785,6 @@
                 </table>
             </div>
 
-            <!-- Mobile Card View -->
             <div class="mobile-card-view" id="serviceCardView" style="display: none;">
             </div>
 
@@ -1863,7 +1857,6 @@
                 </div>
             </div>
 
-            <!-- Desktop Table View -->
             <div class="table-wrapper">
                 <table class="table">
                     <thead>
@@ -1884,7 +1877,6 @@
                 </table>
             </div>
 
-            <!-- Mobile Card View -->
             <div class="mobile-card-view" id="bookingCardView">
             </div>
         </div>
@@ -2002,15 +1994,15 @@
         import { getDatabase, ref, onValue, get, child, remove, set } from 'https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js';
 
         const firebaseConfig = {
-  apiKey: "AIzaSyBJaUQe8IRFBvMQ336moEn382y7Vx5uX5M",
-  authDomain: "chery-arta-kerawang-booking.firebaseapp.com",
-  databaseURL: "https://chery-arta-kerawang-booking-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "chery-arta-kerawang-booking",
-  storageBucket: "chery-arta-kerawang-booking.firebasestorage.app",
-  messagingSenderId: "787599434532",
-  appId: "1:787599434532:web:1ed06b945b755feb4809b1",
-  measurementId: "G-WSYJ7ELDQS"
-};
+            apiKey: "AIzaSyBJaUQe8IRFBvMQ336moEn382y7Vx5uX5M",
+            authDomain: "chery-arta-kerawang-booking.firebaseapp.com",
+            databaseURL: "https://chery-arta-kerawang-booking-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "chery-arta-kerawang-booking",
+            storageBucket: "chery-arta-kerawang-booking.firebasestorage.app",
+            messagingSenderId: "787599434532",
+            appId: "1:787599434532:web:1ed06b945b755feb4809b1",
+            measurementId: "G-WSYJ7ELDQS"
+        };
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
@@ -2266,6 +2258,18 @@
 
             if (!name || !plat_kode || !plat_angka || !plat_huruf || !phone || !model || !service || !date || !time) {
                 alert('Please fill in all required fields.');
+                return false;
+            }
+
+            const selectedDate = new Date(date);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            selectedDate.setHours(0, 0, 0, 0);
+
+            const daysDifference = Math.floor((selectedDate - today) / (1000 * 60 * 60 * 24));
+
+            if (daysDifference < 1) {
+                alert('⚠️ Booking Tidak Diizinkan!\n\nBooking wajib dilakukan minimal H-1 (satu hari sebelum hari pelaksanaan).\n\nContoh:\n- Hari ini: ' + today.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + '\n- Booking paling cepat untuk: ' + new Date(today.getTime() + 24*60*60*1000).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + '\n\nSilakan pilih tanggal yang lebih jauh.');
                 return false;
             }
 
@@ -2621,7 +2625,6 @@
                 else if (status === 'In Progress') statusClass = 'status-in-progress';
                 else if (status === 'Completed') statusClass = 'status-completed';
                 
-                // Desktop Table Row
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${booking.date || ''}</td>
@@ -2632,7 +2635,6 @@
                 `;
                 serviceTableBody.appendChild(row);
 
-                // Mobile Card View
                 const card = document.createElement('div');
                 card.className = 'booking-card-mobile';
                 card.innerHTML = `
@@ -2734,7 +2736,6 @@
                 else if (status === 'In Progress') statusClass = 'status-in-progress';
                 else if (status === 'Completed') statusClass = 'status-completed';
                 
-                // Desktop Table Row
                 const row = document.createElement("tr");
                 row.innerHTML = `
                     <td>${booking.date || ''}</td>
@@ -2757,7 +2758,6 @@
                 `;
                 tbody.appendChild(row);
 
-                // Mobile Card View
                 const card = document.createElement('div');
                 card.className = 'booking-card-mobile';
                 card.innerHTML = `
@@ -3036,8 +3036,11 @@
             initSliderIndicators();
             initTouchSupport();
             initImagePreviewSwipe();
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('date').setAttribute('min', today);
+            
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const tomorrowStr = tomorrow.toISOString().split('T')[0];
+            document.getElementById('date').setAttribute('min', tomorrowStr);
             
             if (checkAdminSession()) {
                 activateAdminPanel();
@@ -3099,4 +3102,3 @@
     </script>
 </body>
 </html>
-            
