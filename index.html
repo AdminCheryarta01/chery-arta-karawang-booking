@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -935,6 +936,7 @@
             color: white;
         }
 
+        /* MOBILE RESPONSIVE TABLE */
         .table-wrapper {
             width: 100%;
             overflow-x: auto;
@@ -966,6 +968,7 @@
             word-wrap: break-word;
         }
 
+        /* CARD VIEW FOR MOBILE */
         .mobile-card-view {
             display: none;
         }
@@ -1223,6 +1226,7 @@
             text-align: center;
         }
 
+        /* MEDIA QUERIES */
         @media (max-width: 1024px) {
             .hero-content h1 {
                 font-size: 2.5rem;
@@ -1305,6 +1309,7 @@
                 grid-template-columns: 1fr;
             }
 
+            /* HIDE TABLE, SHOW CARDS ON MOBILE */
             .table-wrapper {
                 display: none !important;
             }
@@ -1734,8 +1739,8 @@
                     <i class="fas fa-envelope"></i>
                 </div>
                 <h3>Email</h3>
-                <p>cheryaftersales.10006804@gmail.com</p>
-                    <p></p>
+                <p>cheryaftersales.10006804</p>
+                    <p>@gmail.com</p>
             </div>
 
             <div class="contact-card">
@@ -1770,6 +1775,7 @@
                 </button>
             </div>
             
+            <!-- Desktop Table View -->
             <div class="table-wrapper">
                 <table class="table" id="serviceTable" style="display: none;">
                     <thead>
@@ -1785,6 +1791,7 @@
                 </table>
             </div>
 
+            <!-- Mobile Card View -->
             <div class="mobile-card-view" id="serviceCardView" style="display: none;">
             </div>
 
@@ -1857,6 +1864,7 @@
                 </div>
             </div>
 
+            <!-- Desktop Table View -->
             <div class="table-wrapper">
                 <table class="table">
                     <thead>
@@ -1877,6 +1885,7 @@
                 </table>
             </div>
 
+            <!-- Mobile Card View -->
             <div class="mobile-card-view" id="bookingCardView">
             </div>
         </div>
@@ -1994,15 +2003,15 @@
         import { getDatabase, ref, onValue, get, child, remove, set } from 'https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js';
 
         const firebaseConfig = {
-            apiKey: "AIzaSyBJaUQe8IRFBvMQ336moEn382y7Vx5uX5M",
-            authDomain: "chery-arta-kerawang-booking.firebaseapp.com",
-            databaseURL: "https://chery-arta-kerawang-booking-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "chery-arta-kerawang-booking",
-            storageBucket: "chery-arta-kerawang-booking.firebasestorage.app",
-            messagingSenderId: "787599434532",
-            appId: "1:787599434532:web:1ed06b945b755feb4809b1",
-            measurementId: "G-WSYJ7ELDQS"
-        };
+  apiKey: "AIzaSyBJaUQe8IRFBvMQ336moEn382y7Vx5uX5M",
+  authDomain: "chery-arta-kerawang-booking.firebaseapp.com",
+  databaseURL: "https://chery-arta-kerawang-booking-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "chery-arta-kerawang-booking",
+  storageBucket: "chery-arta-kerawang-booking.firebasestorage.app",
+  messagingSenderId: "787599434532",
+  appId: "1:787599434532:web:1ed06b945b755feb4809b1",
+  measurementId: "G-WSYJ7ELDQS"
+};
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
@@ -2270,8 +2279,7 @@
 
             if (daysDifference < 1) {
                 alert('⚠️ Booking Tidak Diizinkan!\n\nBooking wajib dilakukan minimal H-1 (satu hari sebelum hari pelaksanaan).\n\nContoh:\n- Hari ini: ' + today.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + '\n- Booking paling cepat untuk: ' + new Date(today.getTime() + 24*60*60*1000).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + '\n\nSilakan pilih tanggal yang lebih jauh.');
-                return false;
-            }
+                return false;}
 
             if (!/^[A-Z]{1,2}$/.test(plat_kode)) {
                 alert('Kode wilayah harus berupa 1-2 huruf (contoh: B atau AB)');
@@ -2625,6 +2633,7 @@
                 else if (status === 'In Progress') statusClass = 'status-in-progress';
                 else if (status === 'Completed') statusClass = 'status-completed';
                 
+                // Desktop Table Row
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${booking.date || ''}</td>
@@ -2635,6 +2644,7 @@
                 `;
                 serviceTableBody.appendChild(row);
 
+                // Mobile Card View
                 const card = document.createElement('div');
                 card.className = 'booking-card-mobile';
                 card.innerHTML = `
@@ -2720,14 +2730,21 @@
                 document.getElementById('filterDateTo')?.value
                 ? filteredBookings 
                 : allBookings;
+
+                // Sort bookings by ID (timestamp) in descending order - newest first
+            const sortedBookings = [...bookingsToDisplay].sort((a, b) => {
+                const idA = parseInt(a.id) || 0;
+                const idB = parseInt(b.id) || 0;
+                return idB - idA; // Descending order
+            });
             
-            if (bookingsToDisplay.length === 0) {
+            if (sortedBookings.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 2rem;">Tidak ada data booking yang sesuai filter.</td></tr>';
                 cardView.innerHTML = '<div style="text-align: center; padding: 2rem; color: #666;">Tidak ada data booking yang sesuai filter.</div>';
                 return;
             }
 
-            bookingsToDisplay.forEach((booking) => {
+            sortedBookings.forEach((booking) => {
                 let statusClass = 'status-successful';
                 const status = booking.status || 'Successful';
                 
@@ -2736,6 +2753,7 @@
                 else if (status === 'In Progress') statusClass = 'status-in-progress';
                 else if (status === 'Completed') statusClass = 'status-completed';
                 
+                // Desktop Table Row
                 const row = document.createElement("tr");
                 row.innerHTML = `
                     <td>${booking.date || ''}</td>
@@ -2758,6 +2776,7 @@
                 `;
                 tbody.appendChild(row);
 
+                // Mobile Card View
                 const card = document.createElement('div');
                 card.className = 'booking-card-mobile';
                 card.innerHTML = `
@@ -3036,11 +3055,10 @@
             initSliderIndicators();
             initTouchSupport();
             initImagePreviewSwipe();
-            
             const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            const tomorrowStr = tomorrow.toISOString().split('T')[0];
-            document.getElementById('date').setAttribute('min', tomorrowStr);
+tomorrow.setDate(tomorrow.getDate() + 1);
+const minDate = tomorrow.toISOString().split('T')[0];
+document.getElementById('date').setAttribute('min', minDate);
             
             if (checkAdminSession()) {
                 activateAdminPanel();
@@ -3102,3 +3120,4 @@
     </script>
 </body>
 </html>
+            
